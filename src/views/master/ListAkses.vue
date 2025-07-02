@@ -17,15 +17,15 @@
         <tbody>
           <tr v-for="akses in pagedAkses" :key="akses.id" class="hover:bg-indigo-50">
             <td class="px-4 py-2 border">{{ akses.name }}</td>
-            <td class="px-4 py-2 border flex gap-1 justify-center">
-              <button class="bg-yellow-700 hover:bg-yellow-600 focus:ring-4 focus:ring-yellow-300 text-white shadow-md rounded-full p-1.5 text-xs transition" title="View">
-                <span class="material-icons text-xs text-white">visibility</span>
+            <td class="px-4 py-2 border flex gap-0.5 justify-center">
+              <button class="bg-yellow-700 hover:bg-yellow-600 focus:ring-1 focus:ring-yellow-300 text-white rounded-full p-0.5 text-[9px] transition min-w-0 min-h-0" title="View">
+                <span class="material-icons text-[12px] leading-none text-white">visibility</span>
               </button>
-              <button class="bg-blue-700 hover:bg-blue-600 focus:ring-4 focus:ring-blue-300 text-white shadow-md rounded-full p-1.5 text-xs transition" @click="editAkses(akses)" title="Edit">
-                <span class="material-icons text-xs text-white">edit</span>
+              <button class="bg-blue-700 hover:bg-blue-600 focus:ring-1 focus:ring-blue-300 text-white rounded-full p-0.5 text-[9px] transition min-w-0 min-h-0" @click="editAkses(akses)" title="Edit">
+                <span class="material-icons text-[12px] leading-none text-white">edit</span>
               </button>
-              <button class="bg-red-700 hover:bg-red-600 focus:ring-4 focus:ring-red-300 text-white shadow-md rounded-full p-1.5 text-xs transition" @click="deleteAkses(akses.id)" title="Delete">
-                <span class="material-icons text-xs text-white">delete</span>
+              <button class="bg-red-700 hover:bg-red-600 focus:ring-1 focus:ring-red-300 text-white rounded-full p-0.5 text-[9px] transition min-w-0 min-h-0" @click="deleteAkses(akses.id)" title="Delete">
+                <span class="material-icons text-[12px] leading-none text-white">delete</span>
               </button>
             </td>
           </tr>
