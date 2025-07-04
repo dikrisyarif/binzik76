@@ -13,8 +13,10 @@
       <table class="min-w-full bg-white border border-gray-200">
         <thead class="bg-indigo-50">
           <tr>
+            <th class="px-4 py-2 border text-xs font-semibold text-gray-600">Username</th>
+            <th class="px-4 py-2 border text-xs font-semibold text-gray-600">Nama Lengkap</th>
+            <th class="px-4 py-2 border text-xs font-semibold text-gray-600">Notary/PT</th>
             <th class="px-4 py-2 border text-xs font-semibold text-gray-600">Email</th>
-            <th class="px-4 py-2 border text-xs font-semibold text-gray-600">Nama</th>
             <th class="px-4 py-2 border text-xs font-semibold text-gray-600">Role</th>
             <th class="px-4 py-2 border text-xs font-semibold text-gray-600">Status</th>
             <th class="px-4 py-2 border text-xs font-semibold text-gray-600">Update</th>
@@ -23,20 +25,21 @@
         </thead>
         <tbody>
           <tr v-for="user in pagedUsers" :key="user.id" class="hover:bg-indigo-50">
+            <td class="px-4 py-2 border">{{ user.username }}</td>
+            <td class="px-4 py-2 border">{{ user.fullname }}</td>
+            <td class="px-4 py-2 border">{{ user.NotatyPT }}</td>
             <td class="px-4 py-2 border">{{ user.email }}</td>
-            <td class="px-4 py-2 border">{{ user.name }}</td>
-            <td class="px-4 py-2 border">{{ user.role }}</td>
+            <td class="px-4 py-2 border">{{ user.role_nama || user.role_id }}</td>
             <td class="px-4 py-2 border">
-              <span :class="user.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-400'" class="px-2 py-1 rounded text-xs font-semibold">
-                {{ user.status }}
+              <span :class="user.status ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-400'" class="px-2 py-1 rounded text-xs font-semibold">
+                {{ user.status ? 'Active' : 'Inactive' }}
               </span>
             </td>
             <td class="px-4 py-2 border text-xs">
-              <div>by: {{ user.updateBy }}</div>
-              <div>{{ user.updateDate }}</div>
+              <div>{{ user.updated_at ? new Date(user.updated_at).toLocaleString() : '-' }}</div>
             </td>
             <td class="px-4 py-2 border flex gap-0.5 justify-center">
-              <button class="bg-yellow-700 hover:bg-yellow-600 focus:ring-1 focus:ring-yellow-300 text-white rounded-full p-0.5 text-[9px] transition min-w-0 min-h-0" title="View">
+              <button class="bg-yellow-700 hover:bg-yellow-600 focus:ring-1 focus:ring-yellow-300 text-white rounded-full p-0.5 text-[9px] transition min-w-0 min-h-0" title="View" @click="viewUser(user)">
                 <span class="material-icons text-[12px] leading-none text-white">visibility</span>
               </button>
               <button class="bg-blue-700 hover:bg-blue-600 focus:ring-1 focus:ring-blue-300 text-white rounded-full p-0.5 text-[9px] transition min-w-0 min-h-0" @click="editUser(user)" title="Edit">
@@ -54,16 +57,19 @@
       <div class="bg-white p-6 rounded shadow-lg w-full max-w-sm">
         <h3 class="text-lg font-bold mb-4">{{ editId ? 'Edit User' : 'Tambah User' }}</h3>
         <form @submit.prevent="saveUser">
-          <input v-model="form.name" type="text" placeholder="Nama" class="w-full border px-3 py-2 rounded mb-2" required />
+          <input v-model="form.username" type="text" placeholder="Username" class="w-full border px-3 py-2 rounded mb-2" required />
+          <input v-model="form.fullname" type="text" placeholder="Nama Lengkap" class="w-full border px-3 py-2 rounded mb-2" required />
+          <input v-model="form.NotatyPT" type="text" placeholder="Notary/PT" class="w-full border px-3 py-2 rounded mb-2" />
           <input v-model="form.email" type="email" placeholder="Email" class="w-full border px-3 py-2 rounded mb-2" required />
-          <select v-model="form.role" class="w-full border px-3 py-2 rounded mb-2">
-            <option value="Admin">Admin</option>
-            <option value="User">User</option>
-            <option value="Manager">Manager</option>
+          <input v-model="form.password" type="password" placeholder="Password" class="w-full border px-3 py-2 rounded mb-2" :required="!editId" />
+          <select v-model="form.role_id" class="w-full border px-3 py-2 rounded mb-2">
+            <option value="1">Admin</option>
+            <option value="2">User</option>
+            <option value="3">Manager</option>
           </select>
           <select v-model="form.status" class="w-full border px-3 py-2 rounded mb-2">
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
+            <option :value="1">Active</option>
+            <option :value="0">Inactive</option>
           </select>
           <div class="flex justify-end">
             <button type="button" class="mr-2 px-4 py-2" @click="closeForm">Batal</button>
@@ -90,23 +96,27 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-const users = ref([
-  { id: 1, name: 'Admin', email: 'admin@mail.com', role: 'Admin', status: 'active', updateBy: 'System', updateDate: '2025-07-01 10:00' },
-  { id: 2, name: 'User', email: 'user@mail.com', role: 'User', status: 'inactive', updateBy: 'Admin', updateDate: '2025-07-01 09:00' }
-])
+import { ref, computed, onMounted } from 'vue'
+import { getUsers, createUser, updateUser, deleteUser as apiDeleteUser } from '../../services/userService'
+const users = ref([])
 const openForm = ref(false)
 const editId = ref(null)
-const form = ref({ name: '', email: '', role: 'User', status: 'active' })
+const form = ref({ username: '', fullname: '', NotatyPT: '', email: '', password: '', role_id: 1, status: 1 })
 const search = ref('')
 const page = ref(1)
 const pageSize = ref(5)
 
+const fetchUsers = async () => {
+  users.value = await getUsers()
+}
+onMounted(fetchUsers)
+
 const filteredUsers = computed(() => {
   if (!search.value) return users.value
   return users.value.filter(u =>
-    u.name.toLowerCase().includes(search.value.toLowerCase()) ||
-    u.email.toLowerCase().includes(search.value.toLowerCase())
+    (u.username && u.username.toLowerCase().includes(search.value.toLowerCase())) ||
+    (u.fullname && u.fullname.toLowerCase().includes(search.value.toLowerCase())) ||
+    (u.email && u.email.toLowerCase().includes(search.value.toLowerCase()))
   )
 })
 
@@ -120,47 +130,39 @@ const pagedUsers = computed(() => {
   return filteredUsers.value.slice(start, end)
 })
 
+function viewUser(user) {
+  // Optional: tampilkan detail user
+}
 function editUser(user) {
   editId.value = user.id
-  form.value.name = user.name
+  form.value.username = user.username
+  form.value.fullname = user.fullname
+  form.value.NotatyPT = user.NotatyPT
   form.value.email = user.email
-  form.value.role = user.role
-  form.value.status = user.status
+  form.value.password = ''
+  form.value.role_id = user.role_id
+  form.value.status = user.status ? 1 : 0
   openForm.value = true
 }
-function deleteUser(id) {
-  users.value = users.value.filter(u => u.id !== id)
+async function deleteUser(id) {
+  if (!confirm('Yakin hapus user?')) return
+  await apiDeleteUser(id)
+  fetchUsers()
 }
-function saveUser() {
+async function saveUser() {
+  const payload = { ...form.value }
+  if (!payload.password) delete payload.password
   if (editId.value) {
-    const idx = users.value.findIndex(u => u.id === editId.value)
-    if (idx !== -1) {
-      users.value[idx].name = form.value.name
-      users.value[idx].email = form.value.email
-      users.value[idx].role = form.value.role
-      users.value[idx].status = form.value.status
-      users.value[idx].updateBy = 'Admin'
-      users.value[idx].updateDate = new Date().toISOString().slice(0, 16).replace('T', ' ')
-    }
+    await updateUser(editId.value, payload)
   } else {
-    users.value.push({
-      id: Date.now(),
-      name: form.value.name,
-      email: form.value.email,
-      role: form.value.role,
-      status: form.value.status,
-      updateBy: 'Admin',
-      updateDate: new Date().toISOString().slice(0, 16).replace('T', ' ')
-    })
+    await createUser(payload)
   }
+  fetchUsers()
   closeForm()
 }
 function closeForm() {
   openForm.value = false
   editId.value = null
-  form.value.name = ''
-  form.value.email = ''
-  form.value.role = 'User'
-  form.value.status = 'active'
+  form.value = { username: '', fullname: '', NotatyPT: '', email: '', password: '', role_id: 1, status: 1 }
 }
 </script>
