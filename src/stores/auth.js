@@ -13,6 +13,7 @@ export const useAuthStore = defineStore("auth", {
         this.token = res.token
         localStorage.setItem("token", res.token)
         this.user = res.user
+        localStorage.setItem("user", JSON.stringify(res.user)) // simpan user ke localStorage
       } else {
         throw new Error(res.error || 'Login gagal')
       }

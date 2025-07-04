@@ -8,10 +8,16 @@ export async function login({ username, password }) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ username, password })
   });
-  return await res.json();
+  const data = await res.json();
+  console.log('Login response:', data); // log response dari backend
+  return data;
 }
 
 export async function register(data) {
+  console.log('Registering with data:', data);
+  if (!data.username || !data.password) {
+    throw new Error('Username and password are required');
+  }
   const res = await fetch(`${BASE_URL}/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

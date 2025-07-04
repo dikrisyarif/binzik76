@@ -1,14 +1,14 @@
-// src/services/userService.js
+// src/services/menuService.js
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
-const API_URL = `${BASE_URL}/users`;
+const API_URL = `${BASE_URL}/menus`;
 
 function getAuthHeaders() {
   const token = localStorage.getItem('token');
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
-export async function getUsers() {
+export async function getMenus() {
   const res = await fetch(API_URL, {
     headers: {
       ...getAuthHeaders()
@@ -17,7 +17,7 @@ export async function getUsers() {
   return await res.json();
 }
 
-export async function createUser(data) {
+export async function createMenu(data) {
   const res = await fetch(API_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
@@ -26,7 +26,7 @@ export async function createUser(data) {
   return await res.json();
 }
 
-export async function updateUser(id, data) {
+export async function updateMenu(id, data) {
   const res = await fetch(`${API_URL}/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
@@ -35,7 +35,7 @@ export async function updateUser(id, data) {
   return await res.json();
 }
 
-export async function deleteUser(id) {
+export async function deleteMenu(id) {
   const res = await fetch(`${API_URL}/${id}`, {
     method: 'DELETE',
     headers: getAuthHeaders()

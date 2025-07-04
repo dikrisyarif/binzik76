@@ -3,9 +3,9 @@
     <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-4 gap-2">
       <h2 class="text-xl font-bold text-indigo-700 tracking-wide"></h2>
       <div class="flex gap-2">
-        <input v-model="search" type="text" placeholder="Cari menu..." class="border border-indigo-300 px-3 py-2 rounded focus:ring-2 focus:ring-indigo-200" />
+        <input v-model="search" type="text" placeholder="Search menu..." class="border border-indigo-300 px-3 py-2 rounded focus:ring-2 focus:ring-indigo-200" />
         <button class="bg-indigo-600 text-white px-4 py-2 rounded shadow-lg shadow-indigo-300/50 hover:bg-indigo-700 transition flex items-center gap-1" @click="goAdd">
-          <span class="material-icons align-middle text-base mr-1">add</span>Tambah Menu
+          <span class="material-icons align-middle text-base mr-1">add</span>Add Menu
         </button>
       </div>
     </div>
@@ -21,7 +21,7 @@
             <th class="px-2 py-2 border text-xs font-semibold text-gray-600">Route</th>
             <th class="px-2 py-2 border text-xs font-semibold text-gray-600">Status</th>
             <th class="px-2 py-2 border text-xs font-semibold text-gray-600">User</th>
-            <th class="px-2 py-2 border text-xs font-semibold text-gray-600">Aksi</th>
+            <th class="px-2 py-2 border text-xs font-semibold text-gray-600">Action</th>
           </tr>
         </thead>
         <tbody>
@@ -54,13 +54,13 @@
       </table>
     </div>
     <div class="flex justify-between items-center mt-4">
-      <div class="text-sm text-gray-500">Menampilkan {{ pagedMenus.length }} dari {{ filteredMenus.length }} menu</div>
+      <div class="text-sm text-gray-500">Showing {{ pagedMenus.length }} of {{ filteredMenus.length }} menus</div>
       <nav v-if="totalPages > 1" class="inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
         <button :disabled="page===1" @click="page--"
           class="relative inline-flex items-center px-2 py-1 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-indigo-50 disabled:opacity-50 shadow-lg shadow-indigo-200/60">
           <span class="material-icons text-base">chevron_left</span>
         </button>
-        <span class="px-3 py-1 border-t border-b border-gray-300 bg-white text-gray-700">Halaman {{ page }} / {{ totalPages }}</span>
+        <span class="px-3 py-1 border-t border-b border-gray-300 bg-white text-gray-700">Page {{ page }} / {{ totalPages }}</span>
         <button :disabled="page===totalPages" @click="page++"
           class="relative inline-flex items-center px-2 py-1 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-indigo-50 disabled:opacity-50 shadow-lg shadow-indigo-200/60">
           <span class="material-icons text-base">chevron_right</span>
