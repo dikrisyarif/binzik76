@@ -69,6 +69,23 @@ button:focus-visible {
   text-align: center;
 }
 
+.btn-animate {
+  position: relative;
+  overflow: visible;
+  z-index: 1;
+  transition: color 0.2s, background 0.2s, box-shadow 0.3s, transform 0.3s;
+}
+.btn-animate:hover, .btn-animate:focus-visible {
+  box-shadow: 0 8px 24px 0 rgba(255, 215, 0, 0.25), 0 2px 8px 0 rgba(99,102,241,0.10);
+  transform: translateY(-4px) scale(1.04);
+  border-color: #FFD700 !important;
+}
+
+/* Optional: for better contrast on dark backgrounds */
+.btn-animate {
+  outline: none;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;

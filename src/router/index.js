@@ -33,9 +33,11 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token')
+  // Optional: Validate token expiration if using JWT
   if (to.meta.requiresAuth && !token) {
     next('/login')
   } else {
+    // Optional: If token exists, you can add more validation here
     next()
   }
 })

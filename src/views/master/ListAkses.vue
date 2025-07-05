@@ -20,8 +20,14 @@
         <tbody>
           <tr v-for="akses in pagedAkses" :key="akses.id" class="hover:bg-indigo-50">
             <td class="px-4 py-2 border">{{ akses.nama }}</td>
-            <td class="px-4 py-2 border">{{ akses.status ? 'Active' : 'Inactive' }}</td>
-            <td class="px-4 py-2 border">{{ akses.createdate }}</td>
+            <td class="px-4 py-2 border">
+              <span :class="akses.status ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-400'" class="px-2 py-1 rounded text-xs font-semibold">
+                {{ akses.status ? 'Active' : 'Inactive' }}
+              </span>
+            </td>
+            <td class="px-4 py-2 border text-xs">
+              <div>{{ akses.createdate ? new Date(akses.createdate).toLocaleString() : '-' }}</div>
+            </td>
             <td class="px-4 py-2 border">{{ akses.createdby }}</td>
             <td class="px-4 py-2 border flex gap-0.5 justify-center">
               <button class="bg-yellow-700 hover:bg-yellow-600 focus:ring-1 focus:ring-yellow-300 text-white rounded-full p-0.5 text-[9px] transition min-w-0 min-h-0" title="View">
@@ -42,10 +48,12 @@
       <div class="bg-white p-6 rounded shadow-lg w-full max-w-sm">
         <h3 class="text-lg font-bold mb-4">{{ editId ? 'Edit Access' : 'Add Access' }}</h3>
         <form @submit.prevent="saveAkses">
-          <input v-model="form.nama" type="text" placeholder="Access Name" class="w-full border px-3 py-2 rounded mb-4" required />
-          <div class="flex items-center mb-4">
-            <label class="mr-2 text-sm">Status:</label>
-            <select v-model="form.status" class="border rounded px-2 py-1">
+          <div class="relative mb-4">
+            <input v-model="form.nama" id="akses-nama" required class="peer input-group flex-1 outline-none text-sm pt-5 pb-2 bg-transparent focus:ring-0 focus:outline-none" />
+            <label for="akses-nama" class="absolute left-3 top-1.5 text-gray-400 text-sm transition-all duration-200 pointer-events-none peer-focus:-top-3 peer-focus:text-xs peer-focus:text-indigo-600 peer-valid:-top-3 peer-valid:text-xs peer-valid:text-indigo-600 bg-white px-1">Access Name</label>
+          </div>
+          <div class="relative mb-4">
+            <select v-model="form.status" class="input-group w-full text-sm">
               <option :value="true">Active</option>
               <option :value="false">Inactive</option>
             </select>
@@ -176,5 +184,27 @@ function closeForm() {
   padding: 0;
   vertical-align: middle;
   -webkit-font-smoothing: antialiased;
+}
+.input-group {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  background: #fff;
+  padding-left: 0.75rem;
+  padding-right: 2.5rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 1px 4px 0 rgba(99,102,241,0.10);
+}
+.input-group:focus-within, .input-group:hover {
+  outline: 2px solid #6366f1;
+  outline-offset: 0px;
+  border-color: #6366f1;
+  box-shadow: 0 2px 8px 0 rgba(99,102,241,0.18);
+}
+input:focus {
+  outline: none;
+  box-shadow: none;
 }
 </style>

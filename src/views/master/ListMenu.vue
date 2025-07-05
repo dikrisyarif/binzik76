@@ -67,12 +67,20 @@
         </button>
       </nav>
     </div>
+    <MenuForm
+      :openForm="openForm"
+      :editId="editId"
+      :form="form"
+      @close="closeForm"
+      @save="saveMenu"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import MenuForm from './MenuForm.vue'
 const router = useRouter()
 const menus = ref([
   { id: 1, sort: 1, level: 1, name: 'Dashboard', route: '/dashboard', status: 'active', user: 'System' },
@@ -85,6 +93,9 @@ const menus = ref([
 const search = ref('')
 const page = ref(1)
 const perPage = 5
+const openForm = ref(false)
+const editId = ref(null)
+const form = ref({ sort: '', level: '', name: '', route: '', status: 'active', user: '' })
 
 const filteredMenus = computed(() => {
   if (!search.value) return menus.value
@@ -100,12 +111,34 @@ const pagedMenus = computed(() => {
 })
 
 function goAdd() {
-  router.push('/master/menus/add')
+  editId.value = null
+  form.value = { sort: '', level: '', name: '', route: '', status: 'active', user: '' }
+  openForm.value = true
 }
 function goEdit(id) {
-  router.push(`/master/menus/edit/${id}`)
+  const menu = menus.value.find(m => m.id === id)
+  if (menu) {
+    editId.value = id
+    form.value = { ...menu }
+    openForm.value = true
+  }
 }
 function deleteMenu(id) {
   menus.value = menus.value.filter(m => m.id !== id)
+}
+function closeForm() {
+  openForm.value = false
+}
+function saveMenu() {
+  if (editId.value) {
+    // update
+    const idx = menus.value.findIndex(m => m.id === editId.value)
+    if (idx !== -1) menus.value[idx] = { ...form.value, id: editId.value }
+  } else {
+    // add
+    const newId = Math.max(...menus.value.map(m => m.id)) + 1
+    menus.value.push({ ...form.value, id: newId })
+  }
+  openForm.value = false
 }
 </script>
